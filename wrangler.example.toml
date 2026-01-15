@@ -1,0 +1,27 @@
+name = "short-url"
+main = "src/index.ts"
+compatibility_date = "2025-01-15"
+workers_dev = true
+
+# Uncomment and configure your KV namespaces
+# [[kv_namespaces]]
+# binding = "URL_STORAGE"
+# id = "YOUR_KV_NAMESPACE_ID"
+# preview_id = "YOUR_PREVIEW_KV_NAMESPACE_ID"
+
+# [[kv_namespaces]]
+# binding = "ANALYTICS"
+# id = "YOUR_KV_NAMESPACE_ID"
+# preview_id = "YOUR_PREVIEW_KV_NAMESPACE_ID"
+
+# Add routes for custom domains
+# [[routes]]
+# pattern = "your-domain.com/*"
+# zone_name = "your-domain.com"
+
+# Configure vars for different environments
+# [vars]
+# ENV = "development"
+
+# [env.production.vars]
+# ENV = "production"
