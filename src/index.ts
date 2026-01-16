@@ -88,7 +88,7 @@ async function handleCreateUrl(request: Request, env: Env): Promise<Response> {
     const shortUrl = `${new URL(request.url).origin}/s/${shortCode}`;
 
     return new Response(JSON.stringify({ shortUrl, shortCode }), {
-      status: 201,
+      status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch {

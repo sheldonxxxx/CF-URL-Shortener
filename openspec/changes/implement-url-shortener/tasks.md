@@ -48,8 +48,8 @@
   - Parse request body and validate input
   - Generate short code (custom or auto)
   - Store URL mapping in KV
-  - Return 201 with shortUrl response
-  - *Validation:* POST to endpoint returns 201 with correct format
+  - Return 200 with shortUrl response
+  - *Validation:* POST to endpoint returns 200 with correct format
 
 - [x] **TASK-008:** Implement GET /s/{code} redirect
   - Look up short code in KV

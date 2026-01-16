@@ -63,7 +63,7 @@ describe('POST /api/urls', () => {
 
     const response = await makeRequest(exportedHandler, request, env);
 
-    expect(response.status).toBe(201);
+    expect(response.status).toBe(200);
     const body: any = await response.json();
     expect(body).toHaveProperty('shortUrl');
     expect(body).toHaveProperty('shortCode');
@@ -112,7 +112,7 @@ describe('POST /api/urls', () => {
 
     const response = await makeRequest(exportedHandler, request, env);
 
-    expect(response.status).toBe(201);
+    expect(response.status).toBe(200);
     const body: any = await response.json();
     expect(body.shortCode).toBe('mycode');
     expect(body.shortUrl).toContain('/s/mycode');
@@ -153,7 +153,7 @@ describe('POST /api/urls', () => {
 
     const response = await makeRequest(exportedHandler, request, env);
 
-    expect(response.status).toBe(201);
+    expect(response.status).toBe(200);
   });
 });
 
@@ -284,7 +284,7 @@ describe('URL deduplication', () => {
     });
 
     const response1 = await makeRequest(exportedHandler, request1, env);
-    expect(response1.status).toBe(201);
+    expect(response1.status).toBe(200);
     const body1: any = await response1.json();
     expect(body1).toHaveProperty('shortCode');
     expect(body1.existing).toBeUndefined();
@@ -305,7 +305,7 @@ describe('URL deduplication', () => {
     expect(body2.existing).toBe(true);
   });
 
-  it('returns 201 for new URL', async () => {
+  it('returns 200 for new URL', async () => {
     const env = createMockEnv();
     const request = new Request('https://test.dev/api/urls', {
       method: 'POST',
@@ -317,7 +317,7 @@ describe('URL deduplication', () => {
     });
 
     const response = await makeRequest(exportedHandler, request, env);
-    expect(response.status).toBe(201);
+    expect(response.status).toBe(200);
     const body: any = await response.json();
     expect(body).toHaveProperty('shortCode');
     expect(body.existing).toBeUndefined();
@@ -367,7 +367,7 @@ describe('URL deduplication', () => {
     });
 
     const response1 = await makeRequest(exportedHandler, request1, env);
-    expect(response1.status).toBe(201);
+    expect(response1.status).toBe(200);
 
     const url2 = 'https://example.com/different-page';
 

@@ -76,7 +76,7 @@ The solution introduces a reverse index in KV to map original URLs to their shor
 
 ## API Response Changes
 
-### Current Response (201 Created)
+### Current Response (200 Created)
 ```json
 {
   "shortUrl": "https://.../s/abc123",

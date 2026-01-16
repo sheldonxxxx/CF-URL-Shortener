@@ -26,7 +26,7 @@ The system MUST check for existing short codes when a URL is submitted.
 
 **When** a user submits a POST request to `/api/urls` with `{"url": "https://new.example.com"}`
 
-**Then** the response MUST return HTTP 201 with a newly generated short code
+**Then** the response MUST return HTTP 200 with a newly generated short code
 
 **And** the response MUST NOT include `"existing"` or it MUST be `false`
 
@@ -104,11 +104,11 @@ Custom short codes MUST take priority over duplicate URL detection.
 
 The response status code MUST reflect whether the URL is new or existing.
 
-#### Scenario: New URL returns 201
+#### Scenario: New URL returns 200
 
 **When** a URL does not exist in the system
 
-**Then** the response MUST have status code 201 Created
+**Then** the response MUST have status code 200 Created
 
 #### Scenario: Existing URL returns 200
 

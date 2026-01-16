@@ -66,7 +66,7 @@
 - Test: Same URL submitted twice returns existing code
 - Test: Response includes `existing: true` for duplicates
 - Test: Response status is 200 for duplicates
-- Test: Response status is 201 for new URLs
+- Test: Response status is 200 for new URLs
 - Test: Custom codes still work independently
 - **Status**: ✅ Completed
 

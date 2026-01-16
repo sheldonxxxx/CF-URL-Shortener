@@ -19,14 +19,14 @@ Core URL shortening functionality: creating short URLs and redirecting requests 
 
 **Given** a valid long URL and a valid API token  
 **When** the user sends a POST request to `/api/urls` with body `{ "url": "https://example.com/very/long/path" }` and header `Authorization: Bearer <token>`  
-**Then** the system SHALL return status 201 with JSON response containing `{ "shortUrl": "https://domain.com/s/abc123", "shortCode": "abc123" }`
+**Then** the system SHALL return status 200 with JSON response containing `{ "shortUrl": "https://domain.com/s/abc123", "shortCode": "abc123" }`
 
 #### Scenario: Create short URL with custom short code
 
 **Given** a valid long URL, a valid API token, and a custom short code  
 **When** the user sends a POST request to `/api/urls` with body `{ "url": "https://example.com", "customCode": "mylabel" }`  
 **Then** the system SHALL create the short URL with code `mylabel` if it doesn't already exist  
-**And** return status 201 with `{ "shortUrl": "https://domain.com/s/mylabel", "shortCode": "mylabel" }`
+**And** return status 200 with `{ "shortUrl": "https://domain.com/s/mylabel", "shortCode": "mylabel" }`
 
 #### Scenario: Reject invalid URL
 
