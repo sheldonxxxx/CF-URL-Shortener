@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getUrl, setUrl, shortCodeExists, generateShortCode } from './storage/url';
+import { getUrl, setUrl, shortCodeExists, generateShortCode, getUrlByOriginalUrl, setUrlMapping } from './storage/url';
 
 describe('URL storage', () => {
   let mockKv: any;
@@ -69,6 +69,30 @@ describe('URL storage', () => {
         codes.add(generateShortCode());
       }
       expect(codes.size).toBe(1000);
+    });
+  });
+
+  describe('getUrlByOriginalUrl', () => {
+    it('returns null for non-existent URL', async () => {
+      mockKv.get.mockResolvedValue(null);
+      const result = await getUrlByOriginalUrl(mockKv, 'https://example.com');
+      expect(result).toBeNull();
+    });
+
+    it('returns short code for existing URL', async () => {
+      mockKv.get.mockResolvedValue('abc123');
+      const result = await getUrlByOriginalUrl(mockKv, 'https://example.com');
+      expect(result).toBe('abc123');
+    });
+  });
+
+  describe('setUrlMapping', () => {
+    it('stores URL to short code mapping', async () => {
+      await setUrlMapping(mockKv, 'https://example.com', 'abc123');
+      expect(mockKv.put).toHaveBeenCalledWith(
+        expect.stringContaining('url:'),
+        'abc123'
+      );
     });
   });
 });

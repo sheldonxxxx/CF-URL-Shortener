@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { encodeBase62, decodeBase62 } from './utils/base62';
 import { isValidUrl } from './utils/validation';
 import { validateAuthHeader } from './utils/auth';
+import { hashUrl } from './utils/hash';
 
 describe('base62 encoding', () => {
   it('encodes 0 correctly', () => {
@@ -88,5 +89,38 @@ describe('auth validation', () => {
   it('rejects malformed header', () => {
     expect(validateAuthHeader('Bearer', validToken)).toBe(false);
     expect(validateAuthHeader('my-secret-token', validToken)).toBe(false);
+  });
+});
+
+describe('URL hashing', () => {
+  it('produces consistent hash for same URL', async () => {
+    const url = 'https://example.com/path?query=value';
+    const hash1 = await hashUrl(url);
+    const hash2 = await hashUrl(url);
+    expect(hash1).toBe(hash2);
+  });
+
+  it('produces different hashes for different URLs', async () => {
+    const hash1 = await hashUrl('https://example.com/page1');
+    const hash2 = await hashUrl('https://example.com/page2');
+    expect(hash1).not.toBe(hash2);
+  });
+
+  it('produces 64 character hex string (SHA-256)', async () => {
+    const hash = await hashUrl('https://example.com');
+    expect(hash.length).toBe(64);
+    expect(hash).toMatch(/^[0-9a-f]+$/);
+  });
+
+  it('handles URLs with special characters', async () => {
+    const url = 'https://example.com/path?query=value&other=test#fragment';
+    const hash = await hashUrl(url);
+    expect(hash.length).toBe(64);
+  });
+
+  it('handles long URLs', async () => {
+    const longUrl = 'https://example.com/' + 'a'.repeat(1000);
+    const hash = await hashUrl(longUrl);
+    expect(hash.length).toBe(64);
   });
 });

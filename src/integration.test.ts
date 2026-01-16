@@ -268,3 +268,119 @@ describe('Health check', () => {
     expect(response.status).toBe(200);
   });
 });
+
+describe('URL deduplication', () => {
+  it('returns existing short code for duplicate URL', async () => {
+    const env = createMockEnv();
+    const url = 'https://example.com/duplicate';
+
+    const request1 = new Request('https://test.dev/api/urls', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer test-token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url }),
+    });
+
+    const response1 = await makeRequest(exportedHandler, request1, env);
+    expect(response1.status).toBe(201);
+    const body1: any = await response1.json();
+    expect(body1).toHaveProperty('shortCode');
+    expect(body1.existing).toBeUndefined();
+
+    const request2 = new Request('https://test.dev/api/urls', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer test-token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url }),
+    });
+
+    const response2 = await makeRequest(exportedHandler, request2, env);
+    expect(response2.status).toBe(200);
+    const body2: any = await response2.json();
+    expect(body2.shortCode).toBe(body1.shortCode);
+    expect(body2.existing).toBe(true);
+  });
+
+  it('returns 201 for new URL', async () => {
+    const env = createMockEnv();
+    const request = new Request('https://test.dev/api/urls', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer test-token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url: 'https://example.com/new' }),
+    });
+
+    const response = await makeRequest(exportedHandler, request, env);
+    expect(response.status).toBe(201);
+    const body: any = await response.json();
+    expect(body).toHaveProperty('shortCode');
+    expect(body.existing).toBeUndefined();
+  });
+
+  it('different URLs get different short codes', async () => {
+    const env = createMockEnv();
+
+    const request1 = new Request('https://test.dev/api/urls', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer test-token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url: 'https://example.com/page1' }),
+    });
+
+    const response1 = await makeRequest(exportedHandler, request1, env);
+    const body1: any = await response1.json();
+
+    const request2 = new Request('https://test.dev/api/urls', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer test-token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url: 'https://example.com/page2' }),
+    });
+
+    const response2 = await makeRequest(exportedHandler, request2, env);
+    const body2: any = await response2.json();
+
+    expect(body1.shortCode).not.toBe(body2.shortCode);
+  });
+
+  it('custom codes bypass duplicate check', async () => {
+    const env = createMockEnv();
+    const url1 = 'https://example.com/page';
+
+    const request1 = new Request('https://test.dev/api/urls', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer test-token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url: url1, customCode: 'custom1' }),
+    });
+
+    const response1 = await makeRequest(exportedHandler, request1, env);
+    expect(response1.status).toBe(201);
+
+    const url2 = 'https://example.com/different-page';
+
+    const request2 = new Request('https://test.dev/api/urls', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer test-token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url: url2, customCode: 'custom1' }),
+    });
+
+    const response2 = await makeRequest(exportedHandler, request2, env);
+    expect(response2.status).toBe(409);
+  });
+});

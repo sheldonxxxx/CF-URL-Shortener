@@ -2,7 +2,7 @@
 
 import { isValidUrl } from './utils/validation';
 import { validateAuthHeader } from './utils/auth';
-import { getUrl, setUrl, shortCodeExists, generateShortCode } from './storage/url';
+import { getUrl, setUrl, shortCodeExists, generateShortCode, getUrlByOriginalUrl } from './storage/url';
 import { incrementClicks, getAnalytics, shouldTrackClicks } from './storage/analytics';
 
 interface Env {
@@ -69,6 +69,14 @@ async function handleCreateUrl(request: Request, env: Env): Promise<Response> {
       }
       shortCode = customCode;
     } else {
+      const existingCode = await getUrlByOriginalUrl(env.URL_STORAGE, url);
+      if (existingCode) {
+        const shortUrl = `${new URL(request.url).origin}/s/${existingCode}`;
+        return new Response(JSON.stringify({ shortUrl, shortCode: existingCode, existing: true }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
       shortCode = generateShortCode();
       while (await shortCodeExists(env.URL_STORAGE, shortCode)) {
         shortCode = generateShortCode();

@@ -1,4 +1,5 @@
 /// <reference types="@cloudflare/workers-types" />
+import { hashUrl } from '../utils/hash';
 
 export interface UrlRecord {
   originalUrl: string;
@@ -20,6 +21,17 @@ export async function getUrl(kv: KVNamespace, shortCode: string): Promise<UrlRec
   return JSON.parse(data) as UrlRecord;
 }
 
+export async function getUrlByOriginalUrl(kv: KVNamespace, url: string): Promise<string | null> {
+  const urlHash = await hashUrl(url);
+  const shortCode = await kv.get(`url:${urlHash}`);
+  return shortCode;
+}
+
+export async function setUrlMapping(kv: KVNamespace, url: string, shortCode: string): Promise<void> {
+  const urlHash = await hashUrl(url);
+  await kv.put(`url:${urlHash}`, shortCode);
+}
+
 export async function setUrl(
   kv: KVNamespace,
   shortCode: string,
@@ -32,6 +44,7 @@ export async function setUrl(
     trackClicks,
   };
   await kv.put(`short:${shortCode}`, JSON.stringify(record));
+  await setUrlMapping(kv, originalUrl, shortCode);
 }
 
 export async function shortCodeExists(kv: KVNamespace, shortCode: string): Promise<boolean> {
